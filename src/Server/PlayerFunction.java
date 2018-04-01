@@ -7,7 +7,7 @@ public class PlayerFunction extends UnicastRemoteObject implements IPlayerFuncti
 
 	protected PlayerFunction() throws RemoteException {
 		super();
-		
+
 	}
-	
+
 }
