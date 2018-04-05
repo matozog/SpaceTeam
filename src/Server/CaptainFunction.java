@@ -1,63 +1,119 @@
 package Server;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Timer;
 
-public class CaptainFunction extends UnicastRemoteObject implements ICaptainFunction {
-	
-	private int time=0, teamPoints = 0;
+import Captain.ICaptain;
+
+public class CaptainFunction extends UnicastRemoteObject implements ICaptainFunction, Runnable {
+
+	private Timer time;
+	private int teamPoints = 0;
 	private ArrayList<String> listOfCommands;
-	
-	protected CaptainFunction() throws RemoteException {
+	private ArrayList<Player> listOfPlayers;
+	private ServerApp app;
+	private String[] statusCaptain = { "Game stopped", "Give command to the team!", "Prepare to read command!",
+			"Wait for next round!", "Time for your team!" };
+	private boolean runningGame = false;
+	private Thread thread;
+	private Runnable run;
+
+	protected CaptainFunction(ServerApp app) throws RemoteException {
 		super();
-		
+
+		this.app = app;
 		listOfCommands = new ArrayList<String>();
 		listOfCommands.add("Change power of the engine!");
+		run = this;
 	}
 
 	@Override
 	public ArrayList<Player> getPlayerList() {
-		
+
 		return null;
 	}
 
 	@Override
-	public void setTime(int time) {
-		// TODO Auto-generated method stub
-		
+	public void startGame() throws RemoteException {
+		runningGame = true;
+		thread = new Thread(run);
+		thread.start();
 	}
 
 	@Override
-	public int getTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getTeamPoints() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void startGame() {
-		// TODO Auto-generated method stub
-		
+	public void run() {
+		while (runningGame) {
+			try {
+				prepareToReadCmd();
+				Thread.sleep(3000);
+				startRound();
+				Thread.sleep(10000);
+				timeToResponse();
+				Thread.sleep(20000);
+				endRound();
+				Thread.sleep(5000);
+				app.getCaptain().enabledBtnStart();
+			} catch (RemoteException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			runningGame = false;
+		}
 	}
 
 	@Override
 	public void endGame() {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	private void prepareToReadCmd() throws RemoteException {
+		app.getCaptain().setGameStatus(statusCaptain[2]);
+		app.setTextFieldTime(3);
+		app.getLblStatus().setText(statusCaptain[2]);
+		app.getCaptain().setTime(3);
+		app.setTimeToDo(3);
+		app.startTimer();
+	}
+
+	private void startRound() throws RemoteException {
+		app.getCaptain().setGameStatus(statusCaptain[1]);
+		app.getLblStatus().setText(statusCaptain[1]);
+		app.setTextFieldTime(10);
+		app.getCaptain().setTime(10);
+		app.setTimeToDo(10);
+		app.startTimer();
+
+	}
+
+	private void timeToResponse() throws RemoteException {
+		app.getCaptain().setGameStatus(statusCaptain[4]);
+		app.getLblStatus().setText(statusCaptain[4]);
+		app.setTextFieldTime(20);
+		app.getCaptain().setTime(20);
+		app.setTimeToDo(20);
+		app.startTimer();
+	}
+
+	private void endRound() throws RemoteException {
+		app.getCaptain().setGameStatus(statusCaptain[3]);
+		app.getLblStatus().setText(statusCaptain[3]);
+		app.setTextFieldTime(5);
+		app.getCaptain().setTime(5);
+		app.setTimeToDo(5);
+		app.startTimer();
+		app.getCaptain().setPoints();
+		app.setTextFieldPoints();
 	}
 
 	@Override
-	public String getCommand() {
-		// TODO Auto-generated method stub
-		return null;
+	public void setCaptain() throws RemoteException, MalformedURLException, NotBoundException {
+		String url = "rmi://localhost/captain_app";
+		app.setCaptain((ICaptain) Naming.lookup(url));
 	}
-	
-	
-
 }

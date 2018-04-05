@@ -1,15 +1,35 @@
 package Server;
 
 import java.awt.EventQueue;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.TimerTask;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+
+import Captain.ICaptain;
+
+import javax.swing.JSeparator;
+import javax.swing.JList;
+import javax.swing.JTextArea;
 
 public class ServerApp {
 
@@ -17,26 +37,138 @@ public class ServerApp {
 	private ArrayList<Player> listOfPlayers;
 	private CaptainFunction captainFunction;
 	private Context namingContext;
+	private JPanel panelListPlayers;
+	private JButton btnKick;
+	private JTextField textTime;
+	private JLabel lblTeamPoints, lblStatus;
+	private JTextField textPoints;
+	private JList listPlayers;
+	private DefaultListModel modelPlayers;
+	private ICaptain captain;
+	private Timer timer;
+	private int timeToDo = 0, points=0;
 
 	/**
 	 * Initialize the contents of the frame.
-	 * @throws RemoteException 
-	 * @throws NamingException 
+	 * 
+	 * @throws RemoteException
+	 * @throws NamingException
+	 * @throws NotBoundException
+	 * @throws MalformedURLException
 	 */
-	public ServerApp() throws RemoteException, NamingException {
+	public ServerApp() throws RemoteException, NamingException, MalformedURLException, NotBoundException {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 264, 343);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
-		frame.setTitle("ServerApp");
+		frame.setTitle("Server App");
+		frame.getContentPane().setLayout(null);
+
+		panelListPlayers = new JPanel();
+		panelListPlayers.setBorder(BorderFactory.createTitledBorder("List of players"));
+		panelListPlayers.setBounds(12, 100, 222, 140);
+		frame.getContentPane().add(panelListPlayers);
+		panelListPlayers.setLayout(null);
+
+		listPlayers = new JList();
+		listPlayers.setBackground(SystemColor.menu);
+		listPlayers.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		listPlayers.setLayoutOrientation(JList.VERTICAL);
+		listPlayers.setVisibleRowCount(-1);
+		listPlayers.setBounds(12, 25, 198, 102);
+		panelListPlayers.add(listPlayers);
+
+		btnKick = new JButton("Kick");
+		btnKick.setBounds(12, 253, 222, 32);
+		frame.getContentPane().add(btnKick);
+
+		JLabel lblTime = new JLabel("Time:");
+		lblTime.setBounds(12, 13, 42, 17);
+		frame.getContentPane().add(lblTime);
+
+		JLabel lblGameStatus = new JLabel("Game status:");
+		lblGameStatus.setBounds(12, 43, 94, 16);
+		frame.getContentPane().add(lblGameStatus);
+
+		textTime = new JTextField();
+		textTime.setEditable(false);
+		textTime.setBounds(52, 10, 59, 22);
+		frame.getContentPane().add(textTime);
+		textTime.setColumns(10);
+
+		lblTeamPoints = new JLabel("Points:");
+		lblTeamPoints.setBounds(116, 13, 42, 16);
+		frame.getContentPane().add(lblTeamPoints);
+
+		textPoints = new JTextField();
+		textPoints.setEditable(false);
+		textPoints.setBounds(165, 10, 69, 22);
+		frame.getContentPane().add(textPoints);
+		textPoints.setText(Integer.toString(points));
+		textPoints.setColumns(10);
+
+		lblStatus = new JLabel("Game stopped!", SwingConstants.CENTER);
+		lblStatus.setBounds(12, 65, 222, 22);
+		frame.getContentPane().add(lblStatus);
 		listOfPlayers = new ArrayList<Player>();
-		
-		captainFunction = new CaptainFunction();
-		//Registry registry = LocateRegistry.createRegistry(10025);
+
+		captainFunction = new CaptainFunction(this);
 		namingContext = new InitialContext();
-		namingContext.rebind("rmi://localhost/captain_function", captainFunction);
-		//registry.unbind(rmi://localhost:10024/captain_function);
-		
+		namingContext.rebind("rmi:captain_function", captainFunction);
+
+		timer = new Timer(1000, new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				timeToDo--;
+				try {
+					captain.setTime(timeToDo);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+				textTime.setText(Integer.toString(timeToDo));
+				if (timeToDo == 0) {
+					timer.stop();
+				}
+			}
+		});
+	}
+
+	public void startTimer() {
+		timer.restart();
+	}
+
+	public void setTextFieldTime(int time) {
+		textTime.setText(Integer.toString(time));
+	}
+
+	public void setTextFieldPoints() {
+		points++;
+		textPoints.setText(Integer.toString(points));
+	}
+
+	public ICaptain getCaptain() {
+		return captain;
+	}
+
+	public void setCaptain(ICaptain captain) {
+		this.captain = captain;
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimeToDo(int timeToDo) {
+		this.timeToDo = timeToDo;
+	}
+
+	public ArrayList<Player> getListOfPlayers() {
+		return listOfPlayers;
+	}
+
+	public JLabel getLblStatus() {
+		return lblStatus;
 	}
 
 	/**
