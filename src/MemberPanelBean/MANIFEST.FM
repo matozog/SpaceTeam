@@ -1,0 +1,4 @@
+Manifest-version: 1.0
+
+Name: BeanClasses/MemberPanelBean.class
+Java-Bean: True
