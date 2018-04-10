@@ -30,12 +30,15 @@ import Captain.ICaptain;
 import javax.swing.JSeparator;
 import javax.swing.JList;
 import javax.swing.JTextArea;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 
 public class ServerApp {
 
 	private JFrame frame;
 	private ArrayList<Player> listOfPlayers;
 	private CaptainFunction captainFunction;
+	private PlayerFunction playerFunction;
 	private Context namingContext;
 	private JPanel panelListPlayers;
 	private JButton btnKick;
@@ -63,14 +66,16 @@ public class ServerApp {
 		frame.setLocationRelativeTo(null);
 		frame.setTitle("Server App");
 		frame.getContentPane().setLayout(null);
+		frame.setResizable(false);
 
 		panelListPlayers = new JPanel();
 		panelListPlayers.setBorder(BorderFactory.createTitledBorder("List of players"));
 		panelListPlayers.setBounds(12, 100, 222, 140);
 		frame.getContentPane().add(panelListPlayers);
 		panelListPlayers.setLayout(null);
-
-		listPlayers = new JList();
+		
+		modelPlayers = new DefaultListModel();
+		listPlayers = new JList(modelPlayers);
 		listPlayers.setBackground(SystemColor.menu);
 		listPlayers.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		listPlayers.setLayoutOrientation(JList.VERTICAL);
@@ -113,8 +118,10 @@ public class ServerApp {
 		listOfPlayers = new ArrayList<Player>();
 
 		captainFunction = new CaptainFunction(this);
+		playerFunction = new PlayerFunction(this);
 		namingContext = new InitialContext();
 		namingContext.rebind("rmi:captain_function", captainFunction);
+		namingContext.rebind("rmi:player_function", playerFunction);
 
 		timer = new Timer(1000, new ActionListener() {
 
@@ -169,6 +176,14 @@ public class ServerApp {
 
 	public JLabel getLblStatus() {
 		return lblStatus;
+	}
+	
+	public DefaultListModel getModelPlayers() {
+		return modelPlayers;
+	}
+	
+	public JPanel getPanelListPlayers() {
+		return panelListPlayers;
 	}
 
 	/**

@@ -14,21 +14,24 @@ public class CaptainFunction extends UnicastRemoteObject implements ICaptainFunc
 
 	private Timer time;
 	private int teamPoints = 0;
-	private ArrayList<String> listOfCommands;
+
 	private ArrayList<Player> listOfPlayers;
 	private ServerApp app;
-	private String[] statusCaptain = { "Game stopped", "Give command to the team!", "Prepare to read command!",
-			"Wait for next round!", "Time for your team!" };
 	private boolean runningGame = false;
 	private Thread thread;
 	private Runnable run;
+	private String[] statusCaptain = { "Game stopped", "Give command to the team!", "Prepare to read command!",
+			"Wait for next round!", "Time for your team!" };
+	private String[] listOfCommands = {"Rapair fault in room 2!", "Choose hammer from your bag!", "Turn off power in zone number 1!", "Turn on safe mode!",
+			"Check in!", "Select one option in comboBox!", "Set the engine to standby!", "Start turbines!", "Set power the engines to 4!", "Start engines!",
+			"Set turbo mode on engines!", "Start engine number three!","Start autopilot!", "Set the temperature to five degrees!", "Locate stations number 5!",
+			"Add to the log book a stay on the Mars!", "Send message S.O.S to all nearby stations!"
+	}; 
 
 	protected CaptainFunction(ServerApp app) throws RemoteException {
 		super();
 
 		this.app = app;
-		listOfCommands = new ArrayList<String>();
-		listOfCommands.add("Change power of the engine!");
 		run = this;
 	}
 
@@ -115,5 +118,10 @@ public class CaptainFunction extends UnicastRemoteObject implements ICaptainFunc
 	public void setCaptain() throws RemoteException, MalformedURLException, NotBoundException {
 		String url = "rmi://localhost/captain_app";
 		app.setCaptain((ICaptain) Naming.lookup(url));
+		
+		for(Player p: app.getListOfPlayers())
+		{
+			app.getCaptain().addPlayerToList(p);
+		}
 	}
 }
