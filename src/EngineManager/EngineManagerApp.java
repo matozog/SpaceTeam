@@ -18,6 +18,11 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.swing.JButton;
+import javax.swing.JPanel;
+import BeanClasses.MemberPanelBean;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JSeparator;
 
 public class EngineManagerApp extends UnicastRemoteObject implements IMemberTeam, ActionListener {
 
@@ -26,6 +31,8 @@ public class EngineManagerApp extends UnicastRemoteObject implements IMemberTeam
 	private IPlayerFunction playerFunction;
 	private String nickname = "Zuku";
 	private Server.Player player;
+	private MemberPanelBean memberPanelBean;
+	private JTextField textField;
 
 	/**
 	 * Create the application.
@@ -33,7 +40,7 @@ public class EngineManagerApp extends UnicastRemoteObject implements IMemberTeam
 	 */
 	public EngineManagerApp() throws RemoteException, NamingException{
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 488, 412);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setTitle("Engine Manager");
@@ -43,13 +50,39 @@ public class EngineManagerApp extends UnicastRemoteObject implements IMemberTeam
 		if(nickname.length()==0) nickname = "bad nickname";
 		
 		btnConnectToServer = new JButton("Connect to server");
-		btnConnectToServer.setBounds(12, 13, 133, 37);
+		btnConnectToServer.setBounds(180, 13, 150, 37);
 		frame.getContentPane().add(btnConnectToServer);
 		btnConnectToServer.addActionListener(this);
 		
 		btnDisconnect = new JButton("Disconnect");
-		btnDisconnect.setBounds(157, 13, 154, 37);
+		btnDisconnect.setBounds(342, 13, 128, 37);
 		frame.getContentPane().add(btnDisconnect);
+		
+		memberPanelBean = new MemberPanelBean();
+		memberPanelBean.setLblToggleBtn("Start/stop engines:");
+		memberPanelBean.setLblComboBox("Selected component will start:");
+		memberPanelBean.setLblTextField("Engine activation (type active):");
+		memberPanelBean.setLblSlider("Modes engines:");
+		memberPanelBean.setLblList("Activating choosen engine:");
+		memberPanelBean.setLblSpinner("Power engines:");
+		memberPanelBean.setListTitle("Some tools");
+		memberPanelBean.setTitlePanel("Engine Manager");
+		memberPanelBean.setBounds(12, 63, 458, 304);
+		frame.getContentPane().add(memberPanelBean);
+		
+		JLabel lblTimeToDo = new JLabel("Time to do:");
+		lblTimeToDo.setBounds(12, 23, 75, 16);
+		frame.getContentPane().add(lblTimeToDo);
+		
+		textField = new JTextField();
+		textField.setEnabled(false);
+		textField.setBounds(93, 20, 75, 22);
+		frame.getContentPane().add(textField);
+		textField.setColumns(10);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(12, 58, 458, 2);
+		frame.getContentPane().add(separator);
 		
 		player = new Server.Player(nickname,"Engine Manager");
 		
@@ -62,8 +95,7 @@ public class EngineManagerApp extends UnicastRemoteObject implements IMemberTeam
 		Object z = e.getSource();
 		
 		if(z == btnConnectToServer)
-		{
-			
+		{			
 			try {
 				String url ="rmi://localhost/player_function";
 				playerFunction = (IPlayerFunction) Naming.lookup(url);
