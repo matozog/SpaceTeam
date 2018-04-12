@@ -1,10 +1,11 @@
-package MemberPanelBean;
-
+package BeanClasses;
 
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+
+import MemberPanelBean.MemberPanelBean;
 
 public class MemberPanelBeanInfo extends SimpleBeanInfo{
 
