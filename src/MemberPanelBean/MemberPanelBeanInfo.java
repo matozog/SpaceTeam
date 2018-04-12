@@ -1,4 +1,5 @@
-package BeanClasses;
+package MemberPanelBean;
+
 
 
 import java.beans.IntrospectionException;

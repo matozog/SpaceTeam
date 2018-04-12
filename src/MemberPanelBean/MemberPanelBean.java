@@ -1,4 +1,4 @@
-package BeanClasses;
+package MemberPanelBean;
 import java.io.Serializable;
 
 import javax.swing.BorderFactory;

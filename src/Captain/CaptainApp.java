@@ -19,6 +19,8 @@ import javax.naming.NamingException;
 import javax.swing.JFrame;
 
 import Server.ICaptainFunction;
+import Server.Player;
+
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
@@ -31,6 +33,8 @@ import javax.swing.JTextArea;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import java.awt.Color;
+import java.awt.Font;
 
 public class CaptainApp extends UnicastRemoteObject implements ActionListener, ICaptain {
 
@@ -113,10 +117,13 @@ public class CaptainApp extends UnicastRemoteObject implements ActionListener, I
 		textScore.setColumns(10);
 
 		textAreaCommands = new JTextArea();
-		textAreaCommands.setBounds(12, 226, 351, 49);
+		textAreaCommands.setFont(new Font("Times New Roman", Font.BOLD, 15));
+		textAreaCommands.setForeground(new Color(0, 0, 0));
+		textAreaCommands.setBackground(SystemColor.menu);
+		textAreaCommands.setBounds(12, 226, 351, 61);
 		frame.getContentPane().add(textAreaCommands);
 
-		JLabel lblCommandToDo = new JLabel("Command:");
+		JLabel lblCommandToDo = new JLabel("Commands:");
 		lblCommandToDo.setBounds(12, 197, 96, 16);
 		frame.getContentPane().add(lblCommandToDo);
 
@@ -189,9 +196,9 @@ public class CaptainApp extends UnicastRemoteObject implements ActionListener, I
 	}
 
 	@Override
-	public void setPoints() {
-		this.points++;
-		textScore.setText(Integer.toString(points));
+	public void setPoints(int point) {
+		this.points+=point;
+		textScore.setText(Integer.toString(this.points));
 
 	}
 

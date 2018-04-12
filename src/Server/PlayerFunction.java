@@ -1,7 +1,13 @@
 package Server;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
+import Captain.ICaptain;
+import EngineManager.IMemberTeam;
 
 public class PlayerFunction extends UnicastRemoteObject implements IPlayerFunction {
 
@@ -22,5 +28,17 @@ public class PlayerFunction extends UnicastRemoteObject implements IPlayerFuncti
 			app.getCaptain().addPlayerToList(player);
 		}
 		app.getPanelListPlayers().repaint();
+		String url = "rmi://localhost/"+player.getRole();
+		try {
+			IMemberTeam member = ((IMemberTeam) Naming.lookup(url));
+			app.getMembersTeamList().add(member);
+			if(player.getRole().equals("mechanic"))
+			{
+				app.getListOfCommands().get(6).setResponse(player.getName());
+			}
+		} catch (MalformedURLException | NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

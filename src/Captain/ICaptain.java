@@ -6,9 +6,11 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 
+import Server.Player;
+
 public interface ICaptain extends Remote{
 	public void setTime(int time) throws RemoteException;
-	public void setPoints() throws RemoteException;
+	public void setPoints(int point) throws RemoteException;
 	public void setPlayerList(ArrayList<Player> listOfPlayers) throws RemoteException;
 	public void addPlayerToList(Server.Player player) throws RemoteException;
 	public void removePlayerFromList(Server.Player player) throws RemoteException;
