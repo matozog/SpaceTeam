@@ -8,9 +8,7 @@ public class Command {
 	private String response;
 	private Player player;
 
-	public Command(String commandContent, String sendTo, int id)
-	{
-		
+	public Command(String commandContent, String sendTo, int id){
 		this.commandContent=commandContent;
 		this.sendTo=sendTo;
 		

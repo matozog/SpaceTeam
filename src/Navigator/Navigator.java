@@ -146,20 +146,24 @@ public class Navigator extends UnicastRemoteObject implements IMemberTeam, Actio
 		
 		if(z == btnConnectToServer)
 		{			
-			try {
-				String url ="rmi://localhost/player_function";
-				playerFunction = (IPlayerFunction) Naming.lookup(url);
-				playerFunction.registerPlayer(player);
-				btnConnectToServer.setEnabled(false);
-			} catch (MalformedURLException | RemoteException | NotBoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Server is disable!", "Warning", JOptionPane.WARNING_MESSAGE);
-			}
+			connectToServer();
 		}
 		else if(z== btnDisconnect)
 		{
-			
+			// not implemented yet
+		}
+	}
+	
+	private void connectToServer() {
+		try {
+			String url ="rmi://localhost/player_function";
+			playerFunction = (IPlayerFunction) Naming.lookup(url);
+			playerFunction.registerPlayer(player);
+			btnConnectToServer.setEnabled(false);
+		} catch (MalformedURLException | RemoteException | NotBoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Server is disable!", "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 	

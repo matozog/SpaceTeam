@@ -254,16 +254,12 @@ public class ServerApp implements Runnable {
 	private void startRound() throws RemoteException {
 		firstCmd = random.nextInt(listOfCommandsString.length);
 		secondCmd = random.nextInt(listOfCommandsString.length);
-		captain.setGameStatus(statusCaptain[1]);
 		captain.setCommand(listOfCommandsString[firstCmd] + "\n"
 				+ listOfCommandsString[secondCmd]);
-		lblStatus.setText(statusCaptain[1]);
 		for (IMemberTeam member : membersTeamList) {
 			member.setLblGameStatus("Watch Out! Coming commands!");
 		}
-		textTime.setText(Integer.toString(8));
-		captain.setTime(8);
-		timeToDo = 8;
+		refreshGameStatus(statusCaptain[1], 8);
 		startTimer();
 
 	}
@@ -271,15 +267,9 @@ public class ServerApp implements Runnable {
 	private void timeToResponse() throws RemoteException {
 		for (IMemberTeam member : membersTeamList) {
 			member.setEnabledBeans(true);
-		}
-		captain.setGameStatus(statusCaptain[4]);
-		lblStatus.setText(statusCaptain[4]);
-		for (IMemberTeam member : membersTeamList) {
 			member.setLblGameStatus("Check right fields and components!");
 		}
-		textTime.setText(Integer.toString(20));
-		captain.setTime(20);
-		timeToDo = 20;
+		refreshGameStatus(statusCaptain[4], 20);
 		startTimer();
 	}
 
@@ -294,23 +284,28 @@ public class ServerApp implements Runnable {
 			}
 			else member.addPoints(-1);
 		}
-		captain.setGameStatus(statusCaptain[3]);
-		lblStatus.setText(statusCaptain[3]);
-		textTime.setText(Integer.toString(5));
-		captain.setTime(5);
-		timeToDo = 5;
+		refreshGameStatus(statusCaptain[3], 5);
 		startTimer();
-		if(addPoint) 
-		{
+		addPointToCaptain(addPoint);
+	}
+	
+	private void refreshGameStatus(String captainStatus, int timeStatus) throws RemoteException {
+		captain.setGameStatus(captainStatus);
+		lblStatus.setText(captainStatus);
+		textTime.setText(Integer.toString(timeStatus));
+		captain.setTime(timeStatus);
+		timeToDo = timeStatus;
+	}
+	
+	private void addPointToCaptain(boolean addPoint) throws RemoteException {
+		if(addPoint) {
 			captain.setPoints(1);
 			setTextFieldPoints(1);
 		}
-		else 
-		{
+		else {
 			captain.setPoints(-1);
 			setTextFieldPoints(-1);
-		}
-		
+		}	
 	}
 
 	public boolean checkResponse() throws RemoteException 
@@ -318,12 +313,11 @@ public class ServerApp implements Runnable {
 		boolean addPoint=false;
 		for(Command cmd: listOfCommands)
 		{
-			if(cmd.getCommandContent().equals(listOfCommandsString[firstCmd]) || cmd.getCommandContent().equals(listOfCommandsString[secondCmd]))
+			if(wasChosenCommand(cmd))
 			{
 				for(int i=0; i<listOfPlayers.size();i++)
 				{
-					if(cmd.getSendTo().equals(listOfPlayers.get(i).getRole()))
-					{
+					if(wasCommandSendToPlayer(cmd,listOfPlayers.get(i))){
 						switch(cmd.getId())
 						{
 						case TextField:
@@ -375,9 +369,16 @@ public class ServerApp implements Runnable {
 		}
 		return addPoint;
 	}
+	
+	private boolean wasChosenCommand(Command cmd) {
+		return (cmd.getCommandContent().equals(listOfCommandsString[firstCmd]) || cmd.getCommandContent().equals(listOfCommandsString[secondCmd]));
+	}
+	
+	private boolean wasCommandSendToPlayer(Command cmd, Player player) {
+		return cmd.getSendTo().equals(player.getRole());
+	}
 
-	public void startTimer() 
-	{
+	public void startTimer() {
 		timer.restart();
 	}
 

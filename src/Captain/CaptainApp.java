@@ -157,32 +157,36 @@ public class CaptainApp extends UnicastRemoteObject implements ActionListener, I
 		Object z = e.getSource();
 
 		if (z == btnStartGame) {
-			try {
-				if (!connectedToServer) {
-					try {
-						String url = "rmi://localhost/captain_function";
-						cptFunction = (ICaptainFunction) Naming.lookup(url);
-						cptFunction.setCaptain();
-						connectedToServer = true;
-					} catch (MalformedURLException | NotBoundException e1) {
-						JOptionPane.showMessageDialog(null, "Warning", "Could not connected to server!",
-								JOptionPane.WARNING_MESSAGE);
-					}
-				}
-				if (modelPlayers.size() != 0) {
+			if (!connectedToServer) {
+				connectToServer();
+			}
+			if (modelPlayers.size() != 0) {
+				try {
 					cptFunction.startGame();
 					btnStartGame.setEnabled(false);
 					btnStartGame.setText("Next turn");
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
 				}
-				else JOptionPane.showMessageDialog(null, "Not enough number of players!" );
-			} catch (RemoteException e1) {
-				e1.printStackTrace();
 			}
+			else JOptionPane.showMessageDialog(null, "Not enough number of players!" );
 		} else if (z == btnEndGame) {
 			btnStartGame.setText("Start game");
 			resetGame();
 		}
 
+	}
+	
+	public void connectToServer() {
+		try {
+			String url = "rmi://localhost/captain_function";
+			cptFunction = (ICaptainFunction) Naming.lookup(url);
+			cptFunction.setCaptain();
+			connectedToServer = true;
+		} catch (MalformedURLException | NotBoundException | RemoteException e1) {
+			JOptionPane.showMessageDialog(null, "Warning", "Could not connected to server!",
+					JOptionPane.WARNING_MESSAGE);
+		}
 	}
 
 	public void resetGame()
